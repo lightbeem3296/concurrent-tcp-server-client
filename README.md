@@ -53,7 +53,7 @@ python3 server.py -l 8080 -p "happy"
 
 When the server starts, you should see output similar to the following:
 
-```sh
+```bash
 [INFO] Server listening on port 8080
 ```
 
@@ -79,22 +79,38 @@ nc localhost 8080 -i 1 < book.txt
 
 You might see output like this when sending data:
 
-```sh
+```bash
 [INFO] Connected to server 127.0.0.1:8080
 [LOG] Sent 1024 bytes
 [INFO] File 'book.txt' sent successfully.
 ```
 
-### Server Log Example
+### Client Usage
 
-When the server receives data from the client, you will see logs similar to:
+The `client.py` file provides a simple way to connect to the server and send text data. You can run the client using the following command:
 
-```sh
-[INFO] Client 1 connected from ('127.0.0.1', 12345)
-[LOG] Received 1024 bytes from client 1
-[INFO] Data from client 1 written to book_1.txt
-[ANALYSIS] Pattern 'happy' found 5 times in book_1.txt
-[INFO] Client 1 disconnected.
+```bash
+python3 client.py <server_address> <port> <file>
+```
+
+- Replace `<server_address>` with the address of the server (e.g., `localhost`).
+- Replace `<port>` with the port number the server is listening on (e.g., `8080`).
+- Replace `<file>` with the path to the text file you want to send.
+
+**Example**: Send the file `book.txt` to the server on `localhost` and port `8080`.
+
+```bash
+python3 client.py localhost 8080 book.txt
+```
+
+#### Client Output Example
+
+When the client sends data, you should see output similar to:
+
+```bash
+[INFO] Connecting to server at localhost:8080
+[INFO] Sent 1024 bytes from book.txt
+[INFO] File sent successfully.
 ```
 
 ### Performing Pattern Analysis
@@ -107,14 +123,24 @@ To stop the server, you can use `CTRL + C` in the terminal where it is running. 
 
 #### Example Output on Server Shutdown
 
-```sh
+```bash
 [INFO] Server shutting down...
 [INFO] Server socket closed.
 ```
 
 ## Testing
 
-This project has been tested with multiple simultaneous client connections to ensure scalability and robustness. The server is designed to handle over 10 connections efficiently.
+This project includes tests to ensure thread safety, scalability, and correct file creation. The tests are located in the `test_server.py` file and can be run using the following command:
+
+```bash
+python3 -m unittest test_server.py
+```
+
+### Test Cases
+
+- **Concurrent Connections**: The server is tested with 10 simultaneous client connections to ensure it handles multiple connections efficiently.
+- **No Data Connection**: Tests verify that connections without sent data do not result in file creation.
+- **Logging Behavior**: Tests check that appropriate logging occurs for various connection scenarios.
 
 ## Makefile
 
