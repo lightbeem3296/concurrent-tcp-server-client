@@ -104,9 +104,18 @@ def start_server(port, search_pattern=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Multi-threaded Network Server")
     parser.add_argument(
-        "-l", "--listen", type=int, required=True, help="Port to listen on"
+        "-l",
+        "--listen",
+        type=int,
+        required=True,
+        help="Port to listen on",
     )
-    parser.add_argument("-p", "--pattern", type=str, help="Pattern to search in text")
+    parser.add_argument(
+        "-p",
+        "--pattern",
+        type=str,
+        help="Pattern to search in text",
+    )
 
     args = parser.parse_args()
 
