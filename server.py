@@ -1,50 +1,48 @@
 import argparse
+import os
 import socket
 import threading
 import time
-from collections import defaultdict
-from queue import Queue
+from pathlib import Path
 
 # Global data structures to store received data and pattern counts
-received_data = defaultdict(str)
-lock = threading.Lock()
-pattern_queue = Queue()
+CUR_DIR = Path(__file__).parent
+UPLOADS_DIR = CUR_DIR / "uploads"
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # Function to handle each client connection
-def handle_client(conn, addr, client_id, search_pattern=None):
+def handle_client(conn, addr, client_id):
     print(f"[INFO] Client {client_id} connected from {addr}")
 
     file_name = f"book_{client_id}.txt"
-    file_written = False
+    file_path = UPLOADS_DIR / file_name
+    no_data = True
 
     try:
         with conn:
+            recv_data = ""
             while True:
                 data = conn.recv(1024).decode("utf-8")
                 if not data:
                     break
 
-                with lock:
-                    received_data[client_id] += data
-                file_written = True
+                no_data = False
+                recv_data += data
 
                 # Logging received data
                 print(f"[LOG] Received {len(data)} bytes from client {client_id}")
 
             # Write received data to file
-            if file_written:
+            if not no_data:
                 try:
-                    with open(file_name, "w") as f:
-                        f.write(received_data[client_id])
+                    with file_path.open("w") as f:
+                        f.write(recv_data)
                     print(f"[INFO] Data from client {client_id} written to {file_name}")
                 except IOError as e:
                     print(f"[ERROR] Failed to write data to {file_name}: {e}")
             else:
                 print(f"[INFO] No data received from client {client_id}")
-
-            if search_pattern:
-                pattern_queue.put((client_id, search_pattern))
 
     except Exception as e:
         print(f"[ERROR] Error handling client {client_id}: {e}")
@@ -55,35 +53,56 @@ def handle_client(conn, addr, client_id, search_pattern=None):
 # Function to analyze patterns in data
 def pattern_analysis(search_pattern):
     while True:
-        if not pattern_queue.empty():
-            client_id, pattern = pattern_queue.get()
-            data = received_data.get(client_id, "")
-            occurrences = data.lower().count(pattern.lower())
+        print("[ANALYSIS] Begin")
+        occurrences: dict[str, int] = {}
 
-            if occurrences > 0:
+        fnames = os.listdir(UPLOADS_DIR)
+        for fname in fnames:
+            found = 0
+            fpath = UPLOADS_DIR / fname
+            with fpath.open("r") as file:
+                for line in file:
+                    if search_pattern in line:
+                        found += 1
+            occurrences[fname] = found
+
+        sorted_occurrences = dict(
+            sorted(
+                occurrences.items(),
+                key=lambda item: item[1],
+                reverse=True,
+            )
+        )
+        for fname, value in sorted_occurrences.items():
+            if value > 0:
+                fpath = UPLOADS_DIR / fname
+                with fpath.open("r") as file:
+                    title = file.readline().strip()
                 print(
-                    f"[ANALYSIS] Pattern '{pattern}' found {occurrences} times in book_{client_id}.txt"
+                    f"[ANALYSIS] Pattern '{search_pattern}' found {value} times in `{title}`({fname})"
                 )
+            else:
+                break
+        print("[ANALYSIS] End")
+
         time.sleep(3)  # Adjust the interval for pattern checking
 
 
 # Main server function
-def start_server(port, search_pattern=None):
+def start_server(port, search_pattern: None):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(("", port))
     server.listen(10)  # Listening to 10 connections
     print(f"[INFO] Server listening on port {port}")
 
-    client_count = 0
     threads = []
 
     try:
         while True:
             conn, addr = server.accept()
-            client_count += 1
-            client_id = client_count
+            client_id = str(time.time())
             thread = threading.Thread(
-                target=handle_client, args=(conn, addr, client_id, search_pattern)
+                target=handle_client, args=(conn, addr, client_id)
             )
             thread.start()
             threads.append(thread)
