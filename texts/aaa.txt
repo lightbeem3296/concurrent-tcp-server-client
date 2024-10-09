@@ -1,0 +1,49 @@
+book title aaa
+python3 client.py localhost 8080 book.txt
+Client Output Example
+When the client sends data, you should see output similar to:
+
+[INFO] Connecting to server at localhost:8080
+[INFO] Sent 1024 bytes from book.txt
+[INFO] File sent successfully.
+Performing Pattern Analysis
+If a search pattern is provided when starting the server, the server will periodically check for occurrences of the pattern in the received data and log the results.
+
+Stopping the Server
+To stop the server, you can use CTRL + C in the terminal where it is running. This will trigger a graceful shutdown.
+
+Example Output on Server Shutdown
+[INFO] Server shutting down...
+[INFO] Server socket closed.
+python3 client.py localhost 8080 book.txt
+Client Output Example
+When the client sends data, you should see output similar to:
+
+[INFO] Connecting to server at localhost:8080
+[INFO] Sent 1024 bytes from book.txt
+[INFO] File sent successfully.
+Performing Pattern Analysis
+If a search pattern is provided when starting the server, the server will periodically check for occurrences of the pattern in the received data and log the results.
+
+Stopping the Server
+To stop the server, you can use CTRL + C in the terminal where it is running. This will trigger a graceful shutdown.
+
+Example Output on Server Shutdown
+[INFO] Server shutting down...
+[INFO] Server socket closed.
+python3 client.py localhost 8080 book.txt
+Client Output Example
+When the client sends data, you should see output similar to:
+
+[INFO] Connecting to server at localhost:8080
+[INFO] Sent 1024 bytes from book.txt
+[INFO] File sent successfully.
+Performing Pattern Analysis
+If a search pattern is provided when starting the server, the server will periodically check for occurrences of the pattern in the received data and log the results.
+
+Stopping the Server
+To stop the server, you can use CTRL + C in the terminal where it is running. This will trigger a graceful shutdown.
+
+Example Output on Server Shutdown
+[INFO] Server shutting down...
+[INFO] Server socket closed.
