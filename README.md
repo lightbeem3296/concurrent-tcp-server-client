@@ -75,16 +75,6 @@ nc localhost <port> -i <delay> < file.txt
 nc localhost 8080 -i 1 < book.txt
 ```
 
-#### Netcat Output Example
-
-You might see output like this when sending data:
-
-```bash
-[INFO] Connected to server 127.0.0.1:8080
-[LOG] Sent 1024 bytes
-[INFO] File 'book.txt' sent successfully.
-```
-
 ### Client Usage
 
 The `client.py` file provides a simple way to connect to the server and send text data. You can run the client using the following command:
