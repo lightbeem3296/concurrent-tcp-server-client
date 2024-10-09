@@ -90,7 +90,7 @@ You might see output like this when sending data:
 The `client.py` file provides a simple way to connect to the server and send text data. You can run the client using the following command:
 
 ```bash
-python3 client.py <server_address> <port> <file>
+python3 client.py -i <server_address> -p <port> -f <file>
 ```
 
 - Replace `<server_address>` with the address of the server (e.g., `localhost`).
