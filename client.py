@@ -1,6 +1,7 @@
-import socket
 import argparse
+import socket
 import time
+
 
 def send_file(filename, server_ip, port, delay):
     try:
@@ -12,15 +13,15 @@ def send_file(filename, server_ip, port, delay):
 
             # Open the file and send its content
             try:
-                with open(filename, 'r', encoding='utf-8') as file:
+                with open(filename, "r", encoding="utf-8") as file:
                     for line in file:
-                        client_socket.sendall(line.encode('utf-8'))
+                        client_socket.sendall(line.encode("utf-8"))
                         print(f"[LOG] Sent {len(line)} bytes")
                         time.sleep(delay)  # Simulate delay in sending data
                 print(f"[INFO] File '{filename}' sent successfully.")
             except IOError as e:
                 print(f"[ERROR] Failed to read or send file '{filename}': {e}")
-    
+
     except FileNotFoundError:
         print(f"[ERROR] File '{filename}' not found.")
     except ConnectionRefusedError:
@@ -30,12 +31,23 @@ def send_file(filename, server_ip, port, delay):
     except Exception as e:
         print(f"[ERROR] An error occurred: {e}")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Client to send a file to the server")
-    parser.add_argument("-f", "--file", type=str, required=True, help="Path to the file to be sent")
+    parser.add_argument(
+        "-f", "--file", type=str, required=True, help="Path to the file to be sent"
+    )
     parser.add_argument("-i", "--ip", type=str, required=True, help="Server IP address")
-    parser.add_argument("-p", "--port", type=int, required=True, help="Server port number")
-    parser.add_argument("-d", "--delay", type=float, default=0, help="Delay between sending lines (in seconds)")
+    parser.add_argument(
+        "-p", "--port", type=int, required=True, help="Server port number"
+    )
+    parser.add_argument(
+        "-d",
+        "--delay",
+        type=float,
+        default=0,
+        help="Delay between sending lines (in seconds)",
+    )
 
     args = parser.parse_args()
 
