@@ -35,11 +35,25 @@ def send_file(filename, server_ip, port, delay):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Client to send a file to the server")
     parser.add_argument(
-        "-f", "--file", type=str, required=True, help="Path to the file to be sent"
+        "-f",
+        "--file",
+        type=str,
+        required=True,
+        help="Path to the file to be sent",
     )
-    parser.add_argument("-i", "--ip", type=str, required=True, help="Server IP address")
     parser.add_argument(
-        "-p", "--port", type=int, required=True, help="Server port number"
+        "-i",
+        "--ip",
+        type=str,
+        required=True,
+        help="Server IP address",
+    )
+    parser.add_argument(
+        "-p",
+        "--port",
+        type=int,
+        required=True,
+        help="Server port number",
     )
     parser.add_argument(
         "-d",
