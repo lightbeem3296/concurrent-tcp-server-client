@@ -17,17 +17,18 @@ This project implements a multi-threaded network server in Python that can handl
 
 ## Installation
 
-1. **Clone the Repository**:
+1. **Environment**: `Linux` or `WSL`
+2. **Clone the Repository**:
 
    ```bash
    git clone <repository-url>
    cd <repository-directory>
    ```
 
-2. **Install Dependencies**:
+3. **Install Dependencies**:
    No external dependencies are needed beyond Python 3.x.
 
-3. **Download Text Files**:
+4. **Download Text Files**:
    Download large text files (e.g., from Project Gutenberg) in plain text (UTF-8) format. Ensure that each file starts with the book title on the first line.
 
 ## Usage
