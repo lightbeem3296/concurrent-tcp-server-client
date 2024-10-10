@@ -7,7 +7,7 @@ SERVER = server.py
 CLIENT = client.py
 PORT = 8080
 PATTERN = "happy"
-FILE = book.txt
+FILE = texts/aaa.txt
 DELAY = 1
 
 all: run_server run_client
@@ -20,7 +20,7 @@ run_server:
 # Command to run the client
 run_client:
 	@echo "Sending file $(FILE) to the server on port $(PORT) with a delay of $(DELAY) seconds..."
-	nc localhost $(PORT) -i $(DELAY) < $(FILE)
+	python3 $(CLIENT) -i localhost -p $(PORT) -f $(FILE) -d $(DELAY)
 
 # Clean up generated files (if any)
 clean:
