@@ -91,7 +91,7 @@ python3 client.py -i <server_address> -p <port> -f <file>
 **Example**: Send the file `book.txt` to the server on `localhost` and port `8080`.
 
 ```bash
-python3 client.py localhost 8080 book.txt
+python3 client.py -i localhost -p 8080 -f ./texts/aaa.txt
 ```
 
 #### Client Output Example
