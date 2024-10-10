@@ -1,43 +1,46 @@
 import argparse
-import os
 import socket
 import threading
 import time
+from collections import defaultdict
 from pathlib import Path
 
-# Global data structures to store received data and pattern counts
 CUR_DIR = Path(__file__).parent
 UPLOADS_DIR = CUR_DIR / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
+# Global data structures to store received data and pattern counts
+RECV_DATA = defaultdict(str)
+LOCK = threading.Lock()
+
 
 # Function to handle each client connection
-def handle_client(conn, addr, client_id):
+def handle_client(conn, addr, client_id, search_pattern=None):
     print(f"[INFO] Client {client_id} connected from {addr}")
 
     file_name = f"book_{client_id}.txt"
     file_path = UPLOADS_DIR / file_name
-    no_data = True
+    data_recved = False
 
     try:
         with conn:
-            recv_data = ""
             while True:
                 data = conn.recv(1024).decode("utf-8")
                 if not data:
                     break
 
-                no_data = False
-                recv_data += data
+                with LOCK:
+                    RECV_DATA[client_id] += data
+                data_recved = True
 
                 # Logging received data
                 print(f"[LOG] Received {len(data)} bytes from client {client_id}")
 
             # Write received data to file
-            if not no_data:
+            if data_recved:
                 try:
                     with file_path.open("w") as f:
-                        f.write(recv_data)
+                        f.write(RECV_DATA[client_id])
                     print(f"[INFO] Data from client {client_id} written to {file_name}")
                 except IOError as e:
                     print(f"[ERROR] Failed to write data to {file_name}: {e}")
@@ -54,17 +57,11 @@ def handle_client(conn, addr, client_id):
 def pattern_analysis(search_pattern):
     while True:
         print("[ANALYSIS] Begin")
-        occurrences: dict[str, int] = {}
 
-        fnames = os.listdir(UPLOADS_DIR)
-        for fname in fnames:
-            found = 0
-            fpath = UPLOADS_DIR / fname
-            with fpath.open("r") as file:
-                for line in file:
-                    if search_pattern in line:
-                        found += 1
-            occurrences[fname] = found
+        occurrences: dict[str, int] = {}
+        for client_id, data in RECV_DATA.items():
+            data = RECV_DATA.get(client_id, "")
+            occurrences[client_id] = data.lower().count(search_pattern.lower())
 
         sorted_occurrences = dict(
             sorted(
@@ -73,23 +70,22 @@ def pattern_analysis(search_pattern):
                 reverse=True,
             )
         )
-        for fname, value in sorted_occurrences.items():
+        for client_id, value in sorted_occurrences.items():
             if value > 0:
-                fpath = UPLOADS_DIR / fname
-                with fpath.open("r") as file:
-                    title = file.readline().strip()
+                title = RECV_DATA.get(client_id, "").splitlines()[0]
                 print(
-                    f"[ANALYSIS] Pattern '{search_pattern}' found {value} times in `{title}`({fname})"
+                    f"[ANALYSIS] Pattern `{search_pattern}` found {value} times in `{title}`({client_id})"
                 )
             else:
                 break
+
         print("[ANALYSIS] End")
 
         time.sleep(3)  # Adjust the interval for pattern checking
 
 
 # Main server function
-def start_server(port, search_pattern: None):
+def start_server(port, search_pattern=None):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(("", port))
     server.listen(10)  # Listening to 10 connections
@@ -102,7 +98,13 @@ def start_server(port, search_pattern: None):
             conn, addr = server.accept()
             client_id = str(time.time())
             thread = threading.Thread(
-                target=handle_client, args=(conn, addr, client_id)
+                target=handle_client,
+                args=(
+                    conn,
+                    addr,
+                    client_id,
+                    search_pattern,
+                ),
             )
             thread.start()
             threads.append(thread)
